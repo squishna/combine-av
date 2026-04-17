@@ -3,7 +3,7 @@
 # Configuration
 INSTALL_DIR="$HOME/.combine-av"
 BIN_DIR="$HOME/.local/bin"
-APP_NAME="combine-av"
+APP_NAME="combine"
 
 echo "Installing $APP_NAME..."
 
