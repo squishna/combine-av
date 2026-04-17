@@ -1,60 +1,69 @@
 # combine
 
-A fast, lightweight CLI tool to merge video and audio files, batch process directories, and inspect media metadata using FFmpeg.
+<img src="https://raw.githubusercontent.com/ramkrishna-peg/.github/main/file_00000000991c7208b5208584308287a6.png" align="right" width="200" alt="combine logo">
 
-## Features
+A command-line tool to merge video and audio streams with speed and precision.
 
--   **Fast Merging**: Uses stream copying by default to merge video and audio in seconds without quality loss.
--   **Subcommand Architecture**: Clean and intuitive CLI with `merge`, `batch`, `info`, and `update` commands.
--   **High Quality Preset**: Re-encode video using `libx264` with a high-quality CRF setting when needed.
--   **Audio Trimming**: Offset or trim audio starts with the `--audio-start` flag.
--   **Batch Processing**: Automatically pairs video and audio files in a directory by filename and merges them all at once.
--   **Metadata Inspection**: Built-in `info` command to view duration, codecs, and resolution.
--   **Self-Updating**: Keep the tool up-to-date with a single command.
+`combine` is a lightweight Python-based wrapper around FFmpeg that simplifies the process of joining separate video and audio tracks. Whether you're handling a single pair or batch processing an entire directory, `combine` ensures the highest quality with minimal effort.
 
-## Installation
+---
 
-Install `combine` directly from GitHub using the following command:
+## [INSTALLATION](#installation)
+
+You can install `combine` using our streamlined installation script. This will set up the tool in `~/.combine-av` and link the `combine` command to your `~/.local/bin`.
 
 ```bash
 curl -sSL https://raw.githubusercontent.com/squishna/combine-av/main/install.sh | bash
 ```
 
-*Note: Ensure `~/.local/bin` is in your `$PATH`. You may need to add `export PATH="$PATH:$HOME/.local/bin"` to your `.bashrc` or `.zshrc`.*
+**Requirements:**
+- Python 3.6 or later
+- [FFmpeg](https://ffmpeg.org/download.html) (must be in your system `PATH`)
 
-### Requirements
+---
 
--   **Python 3.6+**
--   **FFmpeg** (installed and available in your PATH)
+## [USAGE](#usage)
 
-## Usage
-
-### 1. Merge Video and Audio
+### Basic Merge
+The primary command for merging a single video and audio file:
 ```bash
 combine merge -v video.mp4 -a audio.mp3 -o output.mp4
 ```
 
-**Advanced Merge Options:**
--   `--quality high`: Re-encodes video for better compatibility/quality.
--   `--audio-start 5.5`: Starts the audio from the 5.5-second mark.
--   `--format mkv`: Forces the output container format.
+### Options and Presets
+- **Quality Control**: Use `-q high` to re-encode using `libx264` for better compatibility, or stick with the default `-q fast` for instant stream copying.
+- **Audio Trimming**: Use `--audio-start <seconds>` to sync or trim your audio track precisely.
+- **Format Forcing**: Use `-f <format>` (e.g., `mkv`, `mp4`) to specify the output container.
 
-### 2. Batch Process a Directory
-Merges all video and audio files with matching names in a folder:
+### Batch Processing
+Merge all matching video and audio pairs in a directory automatically:
 ```bash
-combine batch --dir ./my_clips --output-dir ./merged_output
+combine batch --dir ./my_media --output-dir ./merged
 ```
 
-### 3. Inspect Media Info
+### Metadata Inspection
+Quickly view the streams and duration of any media file:
 ```bash
-combine info -i video.mp4
+combine info -i file.mp4
 ```
 
-### 4. Update the Tool
+---
+
+## [SELF-UPDATE](#self-update)
+
+Keep your installation current with the latest features and fixes:
 ```bash
 combine update
 ```
 
-## License
+---
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+## [LICENSE](#license)
+
+This project is released under the **MIT License**. See the [LICENSE](LICENSE) file for more information.
+
+---
+
+<p align="center">
+    <b>Built with speed. Powered by FFmpeg.</b>
+</p>
