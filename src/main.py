@@ -19,10 +19,11 @@ def main():
                  quality=args.quality, 
                  audio_start=args.audio_start, 
                  fmt=args.format,
-                 subtitle_path=args.subtitle)
+                 subtitle_path=args.subtitle,
+                 scale=args.scale)
     
     elif args.command == "batch":
-        batch_process(args.dir, args.output_dir, quality=args.quality)
+        batch_process(args.dir, args.output_dir, quality=args.quality, scale=args.scale)
         
     elif args.command == "info":
         get_info(args.input)

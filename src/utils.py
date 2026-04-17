@@ -10,7 +10,7 @@ def check_ffmpeg():
         print("Error: FFmpeg is not installed or not found in your PATH.")
         sys.exit(1)
 
-def batch_process(dir_path, output_dir, quality="fast"):
+def batch_process(dir_path, output_dir, quality="fast", scale=None):
     """Scans for video/audio pairs and merges them."""
     if not os.path.isdir(dir_path):
         print(f"Error: Directory not found: {dir_path}")
@@ -42,7 +42,7 @@ def batch_process(dir_path, output_dir, quality="fast"):
         if a_file:
             a_path = os.path.join(dir_path, a_file)
             out_path = os.path.join(output_dir, f"{base_name}_merged.mp4")
-            merge_av(v_path, a_path, out_path, quality=quality)
+            merge_av(v_path, a_path, out_path, quality=quality, scale=scale)
         else:
             print(f"Skipping {v_file}: No matching audio file found.")
 

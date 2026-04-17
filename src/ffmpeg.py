@@ -3,8 +3,8 @@ import sys
 import os
 import json
 
-def merge_av(video_path, audio_path, output_path, quality="fast", audio_start=0.0, fmt=None, subtitle_path=None):
-    """Merges video, audio, and optional subtitle with advanced features."""
+def merge_av(video_path, audio_path, output_path, quality="fast", audio_start=0.0, fmt=None, subtitle_path=None, scale=None):
+    """Merges video, audio, and optional subtitle with scaling support."""
     if not os.path.exists(video_path):
         print(f"Error: Video file not found: {video_path}")
         return False
@@ -15,7 +15,7 @@ def merge_av(video_path, audio_path, output_path, quality="fast", audio_start=0.
         print(f"Error: Subtitle file not found: {subtitle_path}")
         return False
 
-    print(f"Merging streams into {output_path} (Quality: {quality})...")
+    print(f"Merging streams into {output_path} (Quality: {quality}, Scale: {scale or 'original'})...")
 
     # Command builder
     command = ["ffmpeg", "-y"]
@@ -37,8 +37,20 @@ def merge_av(video_path, audio_path, output_path, quality="fast", audio_start=0.
     if subtitle_path:
         command += ["-map", "2:s:0"]
     
-    # Video codec: 'fast' = copy, 'high' = re-encode libx264
-    if quality == "fast":
+    # Video Scaling logic
+    scale_map = {
+        "1080p": "1920:1080",
+        "720p": "1280:720",
+        "480p": "854:480",
+        "360p": "640:360"
+    }
+    
+    # If scaling is used, we MUST re-encode (cannot use copy)
+    if scale:
+        res = scale_map.get(scale)
+        command += ["-vf", f"scale={res}:force_original_aspect_ratio=decrease,pad={res}:(ow-iw)/2:(oh-ih)/2"]
+        command += ["-c:v", "libx264", "-crf", "18"]
+    elif quality == "fast":
         command += ["-c:v", "copy"]
     else:
         command += ["-c:v", "libx264", "-crf", "18"]
