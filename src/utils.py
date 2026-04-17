@@ -10,8 +10,8 @@ def check_ffmpeg():
         print("Error: FFmpeg is not installed or not found in your PATH.")
         sys.exit(1)
 
-def batch_process(dir_path, output_dir, quality="fast", scale=None, volume=1.0):
-    """Scans for video/audio pairs and merges them with volume and scale support."""
+def batch_process(dir_path, output_dir, quality="fast", scale=None, volume=1.0, hwaccel=None):
+    """Batch process with scale, volume, and HW accel support."""
     if not os.path.isdir(dir_path):
         print(f"Error: Directory not found: {dir_path}")
         return
@@ -40,7 +40,8 @@ def batch_process(dir_path, output_dir, quality="fast", scale=None, volume=1.0):
         if a_file:
             a_path = os.path.join(dir_path, a_file)
             out_path = os.path.join(output_dir, f"{base_name}_merged.mp4")
-            merge_av(v_path, a_path, out_path, quality=quality, scale=scale, volume=volume)
+            # Batch currently only supports single audio per video
+            merge_av(v_path, [a_path], out_path, quality=quality, scale=scale, volume=volume, hwaccel=hwaccel)
         else:
             print(f"Skipping {v_file}: No matching audio file found.")
 
