@@ -3,16 +3,19 @@ import sys
 import os
 import json
 
-def merge_av(video_path, audio_path, output_path, quality="fast", audio_start=0.0, fmt=None):
-    """Merges video and audio with advanced features."""
+def merge_av(video_path, audio_path, output_path, quality="fast", audio_start=0.0, fmt=None, subtitle_path=None):
+    """Merges video, audio, and optional subtitle with advanced features."""
     if not os.path.exists(video_path):
         print(f"Error: Video file not found: {video_path}")
         return False
     if not os.path.exists(audio_path):
         print(f"Error: Audio file not found: {audio_path}")
         return False
+    if subtitle_path and not os.path.exists(subtitle_path):
+        print(f"Error: Subtitle file not found: {subtitle_path}")
+        return False
 
-    print(f"Merging {video_path} and {audio_path} into {output_path} (Quality: {quality})...")
+    print(f"Merging streams into {output_path} (Quality: {quality})...")
 
     # Command builder
     command = ["ffmpeg", "-y"]
@@ -25,6 +28,15 @@ def merge_av(video_path, audio_path, output_path, quality="fast", audio_start=0.
         command += ["-ss", str(audio_start)]
     command += ["-i", audio_path]
     
+    # Optional subtitle input
+    if subtitle_path:
+        command += ["-i", subtitle_path]
+    
+    # Mapping streams
+    command += ["-map", "0:v:0", "-map", "1:a:0"]
+    if subtitle_path:
+        command += ["-map", "2:s:0"]
+    
     # Video codec: 'fast' = copy, 'high' = re-encode libx264
     if quality == "fast":
         command += ["-c:v", "copy"]
@@ -33,6 +45,10 @@ def merge_av(video_path, audio_path, output_path, quality="fast", audio_start=0.
         
     # Audio codec
     command += ["-c:a", "aac", "-strict", "experimental"]
+    
+    # Subtitle codec: copy for mkv/mp4
+    if subtitle_path:
+        command += ["-c:s", "mov_text" if output_path.endswith(".mp4") else "copy"]
     
     # Finish when shortest stream ends
     command += ["-shortest"]

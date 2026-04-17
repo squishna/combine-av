@@ -14,6 +14,7 @@ def parse_args():
     merge_parser.add_argument("-v", "--video", required=True, help="Path to the input video file.")
     merge_parser.add_argument("-a", "--audio", required=True, help="Path to the input audio file.")
     merge_parser.add_argument("-o", "--output", required=True, help="Path for the output merged file.")
+    merge_parser.add_argument("-s", "--subtitle", help="Path to an optional subtitle file (e.g., .srt, .ass).")
     merge_parser.add_argument("-f", "--format", help="Force output format (e.g., mp4, mkv).")
     merge_parser.add_argument("-q", "--quality", choices=["fast", "high"], default="fast", 
                               help="Quality preset: 'fast' copies video (no re-encoding), 'high' re-encodes (better for some players).")

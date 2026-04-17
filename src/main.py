@@ -18,7 +18,8 @@ def main():
         merge_av(args.video, args.audio, args.output, 
                  quality=args.quality, 
                  audio_start=args.audio_start, 
-                 fmt=args.format)
+                 fmt=args.format,
+                 subtitle_path=args.subtitle)
     
     elif args.command == "batch":
         batch_process(args.dir, args.output_dir, quality=args.quality)
