@@ -1,6 +1,6 @@
 import sys
 from src.utils import check_ffmpeg, self_update, batch_process
-from src.ffmpeg import merge_av, get_info
+from src.ffmpeg import merge_av, get_info, extract_media
 from src.cli import parse_args
 
 def main():
@@ -10,7 +10,6 @@ def main():
         print("Error: No command specified. Use --help for usage info.")
         sys.exit(1)
 
-    # Basic system check (only if not updating)
     if args.command != "update":
         check_ffmpeg()
 
@@ -20,10 +19,18 @@ def main():
                  audio_start=args.audio_start, 
                  fmt=args.format,
                  subtitle_path=args.subtitle,
-                 scale=args.scale)
+                 scale=args.scale,
+                 volume=args.volume)
     
     elif args.command == "batch":
-        batch_process(args.dir, args.output_dir, quality=args.quality, scale=args.scale)
+        batch_process(args.dir, args.output_dir, 
+                      quality=args.quality, 
+                      scale=args.scale, 
+                      volume=args.volume)
+        
+    elif args.command == "extract":
+        extract_type = "audio" if args.audio else "subs"
+        extract_media(args.input, extract_type, args.output)
         
     elif args.command == "info":
         get_info(args.input)

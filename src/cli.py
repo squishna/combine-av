@@ -17,9 +17,11 @@ def parse_args():
     merge_parser.add_argument("-s", "--subtitle", help="Path to an optional subtitle file (e.g., .srt, .ass).")
     merge_parser.add_argument("-f", "--format", help="Force output format (e.g., mp4, mkv).")
     merge_parser.add_argument("-q", "--quality", choices=["fast", "high"], default="fast", 
-                              help="Quality preset: 'fast' copies video (no re-encoding), 'high' re-encodes (better for some players).")
+                              help="Quality preset: 'fast' copies video (no re-encoding), 'high' re-encodes.")
     merge_parser.add_argument("--scale", choices=["1080p", "720p", "480p", "360p"], 
                               help="Scale the video to a specific resolution (forces re-encoding).")
+    merge_parser.add_argument("--volume", type=float, default=1.0, 
+                              help="Adjust audio volume (e.g., 0.5 for 50%, 2.0 for 200%).")
     merge_parser.add_argument("--audio-start", type=float, default=0.0, 
                               help="Start time for audio in seconds (trims/offsets audio).")
 
@@ -29,6 +31,15 @@ def parse_args():
     batch_parser.add_argument("-o", "--output-dir", required=True, help="Directory to save merged files.")
     batch_parser.add_argument("-q", "--quality", choices=["fast", "high"], default="fast", help="Quality preset.")
     batch_parser.add_argument("--scale", choices=["1080p", "720p", "480p", "360p"], help="Scale resolution.")
+    batch_parser.add_argument("--volume", type=float, default=1.0, help="Adjust audio volume.")
+
+    # Extract Subcommand
+    extract_parser = subparsers.add_parser("extract", help="Extract audio or subtitles from a media file.")
+    extract_parser.add_argument("-i", "--input", required=True, help="Input media file.")
+    extract_parser.add_argument("-o", "--output", help="Output file path (optional, will be auto-generated).")
+    group = extract_parser.add_mutually_exclusive_group(required=True)
+    group.add_argument("--audio", action="store_true", help="Extract the audio track.")
+    group.add_argument("--subs", action="store_true", help="Extract the subtitle track.")
 
     # Info Subcommand
     info_parser = subparsers.add_parser("info", help="Display metadata for a media file.")

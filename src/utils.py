@@ -10,15 +10,14 @@ def check_ffmpeg():
         print("Error: FFmpeg is not installed or not found in your PATH.")
         sys.exit(1)
 
-def batch_process(dir_path, output_dir, quality="fast", scale=None):
-    """Scans for video/audio pairs and merges them."""
+def batch_process(dir_path, output_dir, quality="fast", scale=None, volume=1.0):
+    """Scans for video/audio pairs and merges them with volume and scale support."""
     if not os.path.isdir(dir_path):
         print(f"Error: Directory not found: {dir_path}")
         return
 
     os.makedirs(output_dir, exist_ok=True)
     
-    # Simple strategy: look for video files and find audio files with same name
     video_exts = {'.mp4', '.mkv', '.mov', '.avi'}
     audio_exts = {'.mp3', '.wav', '.aac', '.m4a'}
     
@@ -31,7 +30,6 @@ def batch_process(dir_path, output_dir, quality="fast", scale=None):
         base_name = os.path.splitext(v_file)[0]
         v_path = os.path.join(dir_path, v_file)
         
-        # Try to find a matching audio file
         a_file = None
         for ext in audio_exts:
             potential_a = f"{base_name}{ext}"
@@ -42,18 +40,15 @@ def batch_process(dir_path, output_dir, quality="fast", scale=None):
         if a_file:
             a_path = os.path.join(dir_path, a_file)
             out_path = os.path.join(output_dir, f"{base_name}_merged.mp4")
-            merge_av(v_path, a_path, out_path, quality=quality, scale=scale)
+            merge_av(v_path, a_path, out_path, quality=quality, scale=scale, volume=volume)
         else:
             print(f"Skipping {v_file}: No matching audio file found.")
 
 def self_update():
     """Fetches the latest install.sh and runs it."""
     print("Self-updating from GitHub...")
-    # This URL depends on the user's actual repo
     url = "https://raw.githubusercontent.com/squishna/combine-av/main/install.sh"
-    
     try:
-        # We'll use curl | bash directly
         subprocess.run(f"curl -sSL {url} | bash", shell=True, check=True)
     except subprocess.CalledProcessError as e:
         print(f"Error during self-update: {e}")
