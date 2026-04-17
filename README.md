@@ -6,101 +6,166 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![CI](https://github.com/squishna/combine-av/actions/workflows/ci.yml/badge.svg)](https://github.com/squishna/combine-av/actions)
 
-A high-performance FFmpeg-based CLI tool to merge, batch process, extract, and concatenate media streams with ease.
+A command-line media Swiss Army knife powered by FFmpeg. **combine-av** provides a simplified yet powerful interface for merging, batching, extracting, and joining media streams with advanced filtering and hardware acceleration support.
+
+---
+
+## [TABLE OF CONTENTS](#table-of-contents)
+
+-   [Installation](#installation)
+-   [Quick Start](#quick-start)
+-   [Commands](#commands)
+    -   [merge](#merge)
+    -   [batch](#batch)
+    -   [concat](#concat)
+    -   [extract](#extract)
+    -   [info](#info)
+-   [Advanced Options](#advanced-options)
+    -   [Hardware Acceleration](#hardware-acceleration)
+    -   [Video Filters](#video-filters)
+    -   [Audio Volume & Speed](#audio-volume-speed)
+-   [Update](#update)
+-   [Troubleshooting](#troubleshooting)
+-   [License](#license)
 
 ---
 
 ## [INSTALLATION](#installation)
 
-Install **combine-av** instantly using our setup script. This installs the tool to `~/.combine-av` and links the `combine` command to your local bin.
+Install **combine-av** using our automated setup script. This installs the core application into `~/.combine-av` and creates a symbolic link in `~/.local/bin`.
 
 ```bash
 curl -sSL https://raw.githubusercontent.com/squishna/combine-av/main/install.sh | bash
 ```
 
-### Requirements
-- **Python 3.6+**
-- **FFmpeg** (Must be accessible in your system `PATH`)
+### System Requirements
+- **Python**: Version 3.6 or higher.
+- **FFmpeg**: Must be installed and accessible in your system `PATH`.
+    - *Linux*: `sudo apt install ffmpeg` or `sudo pacman -S ffmpeg`
+    - *macOS*: `brew install ffmpeg`
+    - *Windows*: Download from [ffmpeg.org](https://ffmpeg.org/download.html) and add to PATH.
+
+---
+
+## [QUICK START](#quick-start)
+
+Merge a video and an audio track into a single file:
+```bash
+combine merge -v movie.mp4 -a track1.mp3 -o output.mp4
+```
+
+Extract the audio from a video:
+```bash
+combine extract -i movie.mp4 --audio
+```
+
+Join multiple clips into one:
+```bash
+combine concat -i clip1.mp4 clip2.mp4 -o full_video.mp4
+```
 
 ---
 
 ## [COMMANDS](#commands)
 
-### 1. Merge Streams (`merge`)
-Combine a video file with one or more audio tracks and optional subtitles.
+### `merge`
+Combines video and multiple audio streams into one container.
 
-```bash
-combine merge -v video.mp4 -a audio.mp3 -o output.mp4
-```
+| Option | Description |
+| :--- | :--- |
+| `-v, --video` | **Required.** Path to the input video file. |
+| `-a, --audio` | **Required.** Path(s) to input audio track(s). Supports multiple tracks. |
+| `-o, --output` | **Required.** Final output file path. |
+| `-s, --subtitle` | Optional subtitle file (SRT, ASS, VTT). |
+| `-f, --format` | Force an output container format (e.g., `mkv`, `webm`). |
+| `-q, --quality` | `fast` (copies video streams) or `high` (re-encodes for quality). |
 
-**Key Options:**
-- `-a track1.mp3 track2.mp3`: Add multiple audio tracks to a single video.
-- `-s subtitles.srt`: Attach a subtitle file.
-- `-q {fast,high}`: `fast` (default) uses stream copying; `high` re-encodes for maximum compatibility.
-- `--scale {1080p,720p,480p,360p}`: Resize the video frame.
-- `--rotate {90,180,270}`: Clockwise rotation.
-- `--volume 1.5`: Boost audio volume by 50%.
-- `--speed 2.0`: Double the playback speed of both video and audio.
-- `--hwaccel {nvenc,vaapi,videotoolbox}`: Use your GPU for ultra-fast processing.
+### `batch`
+Automatically merge matching video and audio pairs in a directory.
 
----
+| Option | Description |
+| :--- | :--- |
+| `-d, --dir` | **Required.** Directory containing source files. |
+| `-o, --output-dir` | **Required.** Destination directory for merged results. |
+| `-q, --quality` | Quality preset for all files in the batch. |
 
-### 2. Batch Processing (`batch`)
-Automatically merge multiple video/audio pairs within a directory. Files are matched by their base filenames.
-
-```bash
-combine batch --dir ./raw_media --output-dir ./merged_output
-```
-
----
-
-### 3. Join Videos (`concat`)
-Losslessly join multiple video clips into a single continuous file.
+### `concat`
+Losslessly joins multiple video files into a single continuous file.
 
 ```bash
 combine concat -i clip1.mp4 clip2.mp4 clip3.mp4 -o final_movie.mp4
 ```
 
----
+### `extract`
+Extracts specific streams from a media file.
 
-### 4. Extract Tracks (`extract`)
-Quickly pull audio or subtitle tracks out of a media container.
+- `--audio`: Extracts the primary audio track as a high-quality MP3.
+- `--subs`: Extracts the first subtitle track as an SRT file.
 
+### `info`
+Provides detailed technical metadata about any media file.
 ```bash
-combine extract -i movie.mkv --audio  # Extracts primary audio as MP3
-combine extract -i movie.mkv --subs   # Extracts first subtitle as SRT
+combine info -i filename.mp4
 ```
 
 ---
 
-### 5. Media Info (`info`)
-Inspect codecs, resolution, and duration of any media file.
+## [ADVANCED OPTIONS](#advanced-options)
 
-```bash
-combine info -i file.mp4
-```
+### Hardware Acceleration
+Accelerate re-encoding and filtering using your GPU.
+
+- `--hwaccel nvenc`: NVIDIA (requires `h264_nvenc`).
+- `--hwaccel vaapi`: Intel/AMD (requires `h264_vaapi`).
+- `--hwaccel videotoolbox`: Apple Silicon/Intel (requires `h264_videotoolbox`).
+
+### Video Filters
+Applying filters forces re-encoding of the video stream.
+
+- `--scale {1080p, 720p, 480p, 360p}`: Resizes the video frame while maintaining aspect ratio (adds padding if needed).
+- `--rotate {90, 180, 270}`: Rotates the video clockwise by the specified degree.
+- `--crop <w:h:x:y>`: Crops the video to the specified dimensions and offsets.
+- `--speed <float>`: Changes the playback speed (e.g., `1.5` for 150% speed).
+
+### Audio Volume & Speed
+- `--volume <float>`: Multiplies the audio volume (e.g., `2.0` to double volume).
+- `--audio-start <seconds>`: Delays or trims the start of the audio tracks.
 
 ---
 
-## [DEVELOPMENT](#development)
+## [UPDATE](#update)
 
-### Contributions
-We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for setup instructions.
+Update **combine-av** to the latest version directly from GitHub:
 
-### Self-Update
-Keep your `combine` installation up-to-date with the latest features:
 ```bash
 combine update
 ```
 
 ---
 
+## [TROUBLESHOOTING](#troubleshooting)
+
+### "FFmpeg not found"
+Ensure FFmpeg is in your system PATH. Test it by running `ffmpeg -version` in your terminal.
+
+### "Command not found: combine"
+Your shell might not include `~/.local/bin` in its PATH. Add the following line to your `.bashrc` or `.zshrc`:
+```bash
+export PATH="$PATH:$HOME/.local/bin"
+```
+
+### "Unsupported Codec"
+If a specific container (like `.mp4`) doesn't support an input codec, use `--format mkv` for maximum compatibility.
+
+---
+
 ## [LICENSE](#license)
 
-Released under the **MIT License**. See [LICENSE](LICENSE) for details.
+This project is licensed under the **MIT License**. See the [LICENSE](LICENSE) file for the full text.
 
 ---
 
 <p align="center">
-    <b>Version 0.0.1 • Built by squishna</b>
+    <b>Crafted by squishna with precision and speed.</b><br>
+    <i>© 2026 squishna. All rights reserved.</i>
 </p>

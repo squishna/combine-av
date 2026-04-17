@@ -5,11 +5,12 @@ import sys
 class TestCLI(unittest.TestCase):
     def test_merge_args(self):
         # Mock sys.argv for merge command
+        # Note: audio is now a list due to nargs='+'
         sys.argv = ['combine', 'merge', '-v', 'v.mp4', '-a', 'a.mp3', '-o', 'out.mp4']
         args = parse_args()
         self.assertEqual(args.command, 'merge')
         self.assertEqual(args.video, 'v.mp4')
-        self.assertEqual(args.audio, 'a.mp3')
+        self.assertEqual(args.audio, ['a.mp3'])
         self.assertEqual(args.output, 'out.mp4')
         self.assertEqual(args.quality, 'fast')
 
