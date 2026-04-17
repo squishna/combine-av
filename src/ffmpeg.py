@@ -1,5 +1,4 @@
 import subprocess
-import sys
 import os
 import json
 
@@ -17,7 +16,8 @@ def merge_av(video_path, audio_paths, output_path, quality="fast", audio_start=0
     
     # Input Audios
     for a_path in audio_paths:
-        if audio_start > 0: command += ["-ss", str(audio_start)]
+        if audio_start > 0: 
+            command += ["-ss", str(audio_start)]
         command += ["-i", a_path]
         
     if subtitle_path:
@@ -48,17 +48,24 @@ def merge_av(video_path, audio_paths, output_path, quality="fast", audio_start=0
         
     # Audio filters: Volume and Speed
     af = []
-    if volume != 1.0: af.append(f"volume={volume}")
-    if speed != 1.0: af.append(f"atempo={speed}")
-    if af: command += ["-af", ",".join(af)]
+    if volume != 1.0: 
+        af.append(f"volume={volume}")
+    if speed != 1.0: 
+        af.append(f"atempo={speed}")
+    if af: 
+        command += ["-af", ",".join(af)]
 
     # Encoder settings with HW accel
     re_encode_required = bool(vf or af or quality == "high")
     if re_encode_required:
-        if hwaccel == "nvenc": command += ["-c:v", "h264_nvenc"]
-        elif hwaccel == "vaapi": command += ["-c:v", "h264_vaapi"]
-        elif hwaccel == "videotoolbox": command += ["-c:v", "h264_videotoolbox"]
-        else: command += ["-c:v", "libx264", "-crf", "18"]
+        if hwaccel == "nvenc": 
+            command += ["-c:v", "h264_nvenc"]
+        elif hwaccel == "vaapi": 
+            command += ["-c:v", "h264_vaapi"]
+        elif hwaccel == "videotoolbox": 
+            command += ["-c:v", "h264_videotoolbox"]
+        else: 
+            command += ["-c:v", "libx264", "-crf", "18"]
         command += ["-c:a", "aac"]
     else:
         command += ["-c:v", "copy", "-c:a", "copy"]
@@ -67,7 +74,8 @@ def merge_av(video_path, audio_paths, output_path, quality="fast", audio_start=0
         command += ["-c:s", "mov_text" if output_path.endswith(".mp4") else "copy"]
     
     command += ["-shortest"]
-    if fmt: command += ["-f", fmt]
+    if fmt: 
+        command += ["-f", fmt]
     command.append(output_path)
 
     print(f"Processing {output_path}...")
@@ -94,11 +102,13 @@ def concat_videos(input_paths, output_path):
     except subprocess.CalledProcessError as e:
         print(f"Error: {e.stderr.decode()}")
     finally:
-        if os.path.exists(list_path): os.remove(list_path)
+        if os.path.exists(list_path): 
+            os.remove(list_path)
 
 def extract_media(input_path, extract_type, output_path=None):
     """Extracts audio or subtitles."""
-    if not os.path.exists(input_path): return
+    if not os.path.exists(input_path): 
+        return
     base, _ = os.path.splitext(input_path)
     if extract_type == "audio":
         output_path = output_path or f"{base}_extracted.mp3"
@@ -114,7 +124,8 @@ def extract_media(input_path, extract_type, output_path=None):
 
 def get_info(file_path):
     """Retrieves metadata."""
-    if not os.path.exists(file_path): return
+    if not os.path.exists(file_path): 
+        return
     command = ["ffprobe", "-v", "quiet", "-print_format", "json", "-show_format", "-show_streams", file_path]
     try:
         result = subprocess.run(command, capture_output=True, text=True, check=True)
